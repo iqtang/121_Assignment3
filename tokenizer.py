@@ -20,3 +20,13 @@ def tokenize(data):
     stems = [stemmer.stem(token) for token in tokens]
 
     return stems
+
+def computeWordFrequencies(tokens):
+    frequencies = {}
+    for token in tokens:
+        if token in frequencies:
+            frequencies[token] += 1
+        else:
+            frequencies[token] = 1
+
+    return frequencies
