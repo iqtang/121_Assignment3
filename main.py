@@ -20,7 +20,7 @@ def main():
         with open(json_file, 'r') as file:
             NUM_DOCS += 1
             data = json.load(file)
-            docID_map[NUM_DOCS] = data.get("url");
+            docID_map[NUM_DOCS] = data.get("url")
             tokens = tokenize(data)
             word_frequencies = computeWordFrequencies(tokens)
 
