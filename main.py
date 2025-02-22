@@ -1,13 +1,9 @@
 import pathlib
 import json
 from collections import defaultdict
-
 from tokenizer import *
 
 dev_path = pathlib.Path("/Users/delaneyharwell/DEV")
-
-output_dir = pathlib.Path("index_data")
-output_dir.mkdir(exist_ok=True)
 output_file = "index.txt"
 
 partial_index = defaultdict(list)
