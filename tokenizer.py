@@ -1,10 +1,14 @@
 import re
-from bs4 import BeautifulSoup
+import warnings
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 from nltk.stem import PorterStemmer
 
 weights = {
     "title": 3, "h1":3, "h2":2, "h3":2, "b":1.5, "strong":1.5
 }
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
 
 def tokenize(data):
     content = data.get("content")
