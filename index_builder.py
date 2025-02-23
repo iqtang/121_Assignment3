@@ -7,19 +7,24 @@ dev_path = pathlib.Path("developer")
 output_file = "index.txt"
 
 unique_words = set()
-partial_index = defaultdict(list)
 docID_map = dict()
 NUM_DOCS = 0
-SAVE_INTERVAL = 50
+SAVE_INTERVAL = 100
+
+PARTIAL_INDEX_COUNTER = 1
 
 
-def save_index_to_file():
+def save_index_to_file(partial_index):
+    global PARTIAL_INDEX_COUNTER
+
+    partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
+    PARTIAL_INDEX_COUNTER += 1
     try:
-        with open(output_file, "w") as index_file:
-            for word, freq in partial_index.items():
-                index_file.write("{}\t{}\n".format(word, freq))
-        partial_index.clear()
-        print("Saved 50 index entries to output file")
+        sorted_index = {word: sorted(postings, key=lambda x: x[0]) for word, postings in partial_index.items()}
+
+        with open(partial_index_path, 'w') as file:
+            json.dump(sorted_index, file)
+
     except FileNotFoundError:
         print("Index file not found")
         return
@@ -27,7 +32,10 @@ def save_index_to_file():
 
 def main():
     global NUM_DOCS
+
     counter = 0
+    partial_index = defaultdict(list)
+
     for json_file in dev_path.rglob("*.json"):
         counter += 1
         with open(json_file, 'r') as file:
@@ -41,7 +49,10 @@ def main():
                 partial_index[word].append((NUM_DOCS, freq))
 
             if counter % SAVE_INTERVAL == 0:
-                save_index_to_file()
+                save_index_to_file(partial_index)
+                partial_index.clear()
+                break
+
     if partial_index:
         save_index_to_file()
 
