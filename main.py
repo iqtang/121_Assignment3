@@ -3,9 +3,10 @@ import json
 from collections import defaultdict
 from tokenizer import *
 
-dev_path = pathlib.Path("/Users/delaneyharwell/DEV")
+dev_path = pathlib.Path("developer")
 output_file = "index.txt"
 
+unique_words = set()
 partial_index = defaultdict(list)
 docID_map = dict()
 NUM_DOCS = 0
