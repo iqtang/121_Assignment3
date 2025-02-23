@@ -1,15 +1,17 @@
 import pathlib
 import json
+import heapq
 from collections import defaultdict
 from tokenizer import *
 
 dev_path = pathlib.Path("developer")
+partial_path = pathlib.Path("partial_indices")
 output_file = "index.txt"
 
 unique_words = set()
 docID_map = dict()
 NUM_DOCS = 0
-SAVE_INTERVAL = 100
+SAVE_INTERVAL = 2000
 
 PARTIAL_INDEX_COUNTER = 1
 
@@ -28,6 +30,17 @@ def save_index_to_file(partial_index):
     except FileNotFoundError:
         print("Index file not found")
         return
+
+
+def merge_indices():
+    write_buffer = "index.json"
+
+    read_buffers = []
+    for json_file in partial_path.rglob("*.json"):
+        with open(json_file, "r") as file:
+            read_buffers.append(file)
+
+
 
 
 def main():
@@ -51,10 +64,9 @@ def main():
             if counter % SAVE_INTERVAL == 0:
                 save_index_to_file(partial_index)
                 partial_index.clear()
-                break
 
     if partial_index:
-        save_index_to_file()
+        save_index_to_file(partial_index)
 
 
 
