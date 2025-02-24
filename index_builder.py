@@ -72,7 +72,7 @@ def merge_indices():
 
 def main():
     global NUM_DOCS
-    '''
+
     counter = 0
     partial_index = defaultdict(list)
 
@@ -94,9 +94,9 @@ def main():
 
     if partial_index:
         save_index_to_file(partial_index)
-    '''
-    merge_indices()
-    #generate_report(final_index)
+
+    final_index = merge_indices()
+    generate_report(final_index)
 
 
 def generate_report(final_index):
