@@ -7,7 +7,7 @@ from tokenizer import *
 
 dev_path = pathlib.Path("developer")
 partial_path = pathlib.Path("partial_indices")
-output_file = "index.txt"
+output_file = "index.json"
 
 unique_words = set()
 docID_map = dict()
@@ -23,7 +23,7 @@ def save_index_to_file(partial_index):
     partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
     PARTIAL_INDEX_COUNTER += 1
     try:
-        sorted_index = {word: sorted(postings, key=lambda x: x[0]) for word, postings in partial_index.items()}
+        sorted_index = {word: sorted(postings, key=lambda x: x[0]) for word, postings in sorted(partial_index.items())}
 
         with open(partial_index_path, 'w') as file:
             json.dump(sorted_index, file)
@@ -59,7 +59,7 @@ def merge_indices():
 
 def main():
     global NUM_DOCS
-
+    '''
     counter = 0
     partial_index = defaultdict(list)
 
@@ -81,6 +81,7 @@ def main():
 
     if partial_index:
         save_index_to_file(partial_index)
+    '''
     final_index = merge_indices()
     generate_report(final_index)
 
