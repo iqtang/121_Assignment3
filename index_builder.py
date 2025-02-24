@@ -1,6 +1,7 @@
 import pathlib
 import json
 import heapq
+import ijson
 import os
 from collections import defaultdict
 from tokenizer import *
@@ -54,7 +55,19 @@ def merge_indices():
 
     return final_index
 
+    '''
+    merged_index = defaultdict(list)
+    heap = []
+    read_buffers = []
 
+    for json_file in partial_path.rglob("*.json"):
+        file = open(json_file, "r")
+        read_buffers.append(ijson.parse(file))
+
+        for prefix, event, value in read_buffers[0]:
+            if event == "map_key":
+                print(value)
+                '''
 
 
 def main():
@@ -82,8 +95,8 @@ def main():
     if partial_index:
         save_index_to_file(partial_index)
     '''
-    final_index = merge_indices()
-    generate_report(final_index)
+    merge_indices()
+    #generate_report(final_index)
 
 
 def generate_report(final_index):
