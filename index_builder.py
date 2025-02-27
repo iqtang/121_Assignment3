@@ -70,10 +70,49 @@ def merge_indices():
     '''
 
 
+def split_index():
+    ranges = {"0-4", "5-9", "a-m", "n-z"}
+    range_posting = defaultdict(None)
+
+
+
+    index = defaultdict(list)
+    with open("index.json", "r") as file:
+        index = json.load(file)
+
+
+    current_range = "0-4"
+    for word, posting in index.items():
+        first_char = word[0].lower()
+
+        new_range = get_range(first_char)
+
+        if new_range != current_range:
+            with open(f"index_ranges/index[{current_range}]", "w") as file:
+                json.dump(range_posting, file)
+
+            range_posting.clear()
+            current_range = new_range
+
+        range_posting[word] = posting
+
+def get_range(character):
+    if '0' <= character <= '4':
+        return "0-4"
+    elif '5' <= character <= '9':
+        return "5-9"
+    elif 'a' <= character <= 'm':
+        return "a-m"
+    elif 'n' <= character <= 'z':
+        return "n-z"
+    else:
+        return None
+
+
 def main():
     global NUM_DOCS
 
-    counter = 0
+    '''counter = 0
     partial_index = defaultdict(list)
 
     for json_file in dev_path.rglob("*.json"):
@@ -96,7 +135,8 @@ def main():
         save_index_to_file(partial_index)
 
     final_index = merge_indices()
-    generate_report(final_index)
+    generate_report(final_index)'''
+    split_index()
 
 
 def generate_report(final_index):
