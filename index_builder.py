@@ -67,7 +67,7 @@ def merge_indices():
         for prefix, event, value in read_buffers[0]:
             if event == "map_key":
                 print(value)
-                '''
+    '''
 
 
 def main():
