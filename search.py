@@ -1,5 +1,15 @@
 from nltk.stem import PorterStemmer
 import re
+from index_builder import get_range
+
+def categorize_tokens(terms):
+    categories = {'0-4': [], '5-9': [], 'a-m': [], 'n-z': []}
+
+    for term in terms:
+        range = get_range(term)
+        categories[range].append(term)
+
+    return categories
 
 
 
@@ -12,7 +22,7 @@ class SearchEngine:
         query = query.lower().split()
         query = re.sub(r'[^a-zA-Z0-9]', " ", query)
         terms = re.findall(r'\b[a-zA-Z0-9_]+\b', query)
-        terms = [(stemmer.stem(word), 1) for word in terms]
+        terms = [stemmer.stem(word) for word in terms]
         if not terms:
             return []
         doc_set = []
