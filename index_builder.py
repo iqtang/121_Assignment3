@@ -112,7 +112,7 @@ def get_range(character):
 def main():
     global NUM_DOCS
 
-    '''counter = 0
+    counter = 0
     partial_index = defaultdict(list)
 
     for json_file in dev_path.rglob("*.json"):
@@ -135,7 +135,7 @@ def main():
         save_index_to_file(partial_index)
 
     final_index = merge_indices()
-    generate_report(final_index)'''
+    generate_report(final_index)
     split_index()
 
 

@@ -1,9 +1,18 @@
+from nltk.stem import PorterStemmer
+import re
+
+
+
 class SearchEngine:
     def __init__(self, inverted_index):
         self.inverted_index = inverted_index
 
     def search(self, query):
-        terms = query.lower().split()
+        stemmer = PorterStemmer()
+        query = query.lower().split()
+        query = re.sub(r'[^a-zA-Z0-9]', " ", query)
+        terms = re.findall(r'\b[a-zA-Z0-9_]+\b', query)
+        terms = [(stemmer.stem(word), 1) for word in terms]
         if not terms:
             return []
         doc_set = []
