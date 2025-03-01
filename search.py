@@ -1,6 +1,6 @@
 from nltk.stem import PorterStemmer
 import re
-from index_builder import get_range
+from index_builder import get_range, docID_map
 
 def categorize_tokens(terms):
     categories = {'0-4': [], '5-9': [], 'a-m': [], 'n-z': []}
@@ -33,8 +33,7 @@ class SearchEngine:
                 return []
                 #return []? missing chunk of query in index table so how to proceed?
         result_docs = set.intersection(*doc_set) #returns only the documents that have all the qery terms
-        #will need to change this to return actual urls with mapping
-        return list(result_docs)
+        return [docID_map[result] for result in result_docs]
 
 
 
