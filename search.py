@@ -30,9 +30,8 @@ class SearchEngine:
             if term in self.inverted_index:
                 doc_set.append(set(self.inverted_index[term].keys()))
             else:
-                pass
+                return []
                 #return []? missing chunk of query in index table so how to proceed?
-        print(doc_set)
         result_docs = set.intersection(*doc_set) #returns only the documents that have all the qery terms
         #will need to change this to return actual urls with mapping
         return list(result_docs)

@@ -6,6 +6,9 @@ NUM_TERMS = 1094910
 NUM_DOCS = 55393
 
 def calculate_tfidf(posting):
+    #TF(t,d) = (Num term t appears in document d) / (total # terms in doc d)
+    #IDF{t, D) = log((total # of docs in corpus D) / (num doc containing term t)
+    #TF-IDF(t, d, D) = TF(t,d)*IDF(t,D)
     for docid, freq in posting:
 
 
