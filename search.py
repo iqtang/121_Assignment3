@@ -1,3 +1,5 @@
+import os
+
 from nltk.stem import PorterStemmer
 import re
 import json
@@ -26,23 +28,24 @@ class SearchEngine:
         terms = [stemmer.stem(word) for word in terms]
         if not terms:
             return []
+
+        categorized_terms = categorize_tokens(terms)
+        index_data = {}
+        for term_range, term_list in categorized_terms.items():
+            if term_list:
+                partial_index_path = f"index_ranges/index[{term_range}]"
+                if os.path.exists(partial_index_path):
+                    with open(partial_index_path, "r") as f:
+                        index_data.update(json.load(f))
         doc_sets = []
         for term in terms:
-            doc_set = self.search_partial_index(term)
+            doc_set = set(index_data.get(term, {}).keys())
             if not doc_set:
                 return []
             doc_sets.append(doc_set)
         result_docs = set.intersection(*doc_sets) if doc_sets else set() #returns only the documents that have all the qery terms
         return [docID_map[result] for result in result_docs]
 
-    def search_partial_index(self, term):
-        term_range = get_range(term)
-        partial_index_path = f"index_ranges/index[{term_range}]"
-        if not partial_index_path:
-            return set()
-        with open(partial_index_path, "r") as partial_index:
-            index_data = json.load(partial_index)
-            return set(index_data.get(term, {}).keys())
 
 
 
