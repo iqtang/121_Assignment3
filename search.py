@@ -73,8 +73,31 @@ if __name__ == "__main__":
     }
 
     engine = SearchEngine(inverted_index)
-    queries = ["christina lopes", "machine learning", "ACM", "master of software engineering"]
+    queries = ["cristina lopes", "machine learning", "ACM", "master of software engineering"]
+    print("\n--- Running milestone queries ---")
     for q in queries:
+        print(f"\nQuery: '{q}'")
         results = engine.search(q)
-        for r in results:
-            print(r)
+        if results:
+            print(f"Top {min(5, len(results))} results:")
+            for idx, (doc_id, url, score) in enumerate(results[:5], start=1):
+                print(f"{idx}. DocID: {doc_id}, URL: {url}, Score: {score}")
+        else:
+            print("No results found.")
+
+    print("\n--- Query Search ---")
+    print("Type your query and press Enter.")
+    print("Type 'exit' to quit.\n")
+
+    while True:
+        query = input("Enter your search query: ")
+        if query.lower() == 'exit':
+            print("Goodbye!")
+            break
+        results = engine.search(query)
+        if results:
+            print(f"\nTop {min(5, len(results))} results for '{query}':")
+            for idx, (doc_id, url, score) in enumerate(results[:5], start=1):
+                print(f"{idx}. DocID: {doc_id}, URL: {url}, Score: {score}")
+        else:
+            print(f"No results found for '{query}'.\n")
