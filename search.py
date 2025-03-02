@@ -1,5 +1,6 @@
 from nltk.stem import PorterStemmer
 import re
+import json
 from index_builder import get_range, docID_map
 
 def categorize_tokens(terms):
@@ -25,15 +26,24 @@ class SearchEngine:
         terms = [stemmer.stem(word) for word in terms]
         if not terms:
             return []
-        doc_set = []
+        doc_sets = []
         for term in terms:
-            if term in self.inverted_index:
-                doc_set.append(set(self.inverted_index[term].keys()))
-            else:
+            doc_set = self.search_partial_index(term)
+            if not doc_set:
                 return []
-                #return []? missing chunk of query in index table so how to proceed?
-        result_docs = set.intersection(*doc_set) #returns only the documents that have all the qery terms
+            doc_sets.append(doc_set)
+        result_docs = set.intersection(*doc_sets) if doc_sets else set() #returns only the documents that have all the qery terms
         return [docID_map[result] for result in result_docs]
+
+    def search_partial_index(self, term):
+        term_range = get_range(term)
+        partial_index_path = f"index_ranges/index[{term_range}]"
+        if not partial_index_path:
+            return set()
+        with open(partial_index_path, "r") as partial_index:
+            index_data = json.load(partial_index)
+            return set(index_data.get(term, {}).keys())
+
 
 
 
