@@ -6,6 +6,10 @@ import os
 from collections import defaultdict
 from tokenizer import *
 from ranking import calculate_tf
+import warnings
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+
 
 dev_path = pathlib.Path("/users/delaneyharwell/DEV")
 partial_path = pathlib.Path("partial_indices")
@@ -14,7 +18,7 @@ output_file = "index.json"
 unique_words = set()
 docID_map = dict()
 NUM_DOCS = 0
-SAVE_INTERVAL = 10
+SAVE_INTERVAL = 2000
 
 PARTIAL_INDEX_COUNTER = 1
 
@@ -30,17 +34,31 @@ def add_to_map(data):
 def save_index_to_file(partial_index):
     global PARTIAL_INDEX_COUNTER
     os.makedirs(partial_path, exist_ok=True)
+
     partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
     PARTIAL_INDEX_COUNTER += 1
-    sorted_index = {key: {val: partial_index[val] for val in sorted(partial_index[key])} for key in sorted(partial_index)}
     try:
+        sorted_index = {word: sorted(postings, key=lambda x: x[0]) for word, postings in sorted(partial_index.items())}
+
         with open(partial_index_path, 'w') as file:
             json.dump(sorted_index, file)
-
 
     except FileNotFoundError:
         print("Index file not found")
         return
+# def save_index_to_file(partial_index):
+#     global PARTIAL_INDEX_COUNTER
+#     partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
+#     PARTIAL_INDEX_COUNTER += 1
+#     #sorted_index = {key: {val: partial_index[val] for val in sorted(partial_index[key])} for key in sorted(partial_index)}
+#     try:
+#         with open(partial_index_path, 'w') as file:
+#             json.dump(partial_index, file)
+#
+#
+#     except FileNotFoundError:
+#         print("Index file not found")
+#         return
 
 
 def merge_indices():
@@ -80,8 +98,20 @@ def split_index():
         new_range = get_range(first_char)
 
         if new_range != current_range:
+            if os.path.exists(f"index_ranges/index[{current_range}]"):
+                with open(f"index_ranges/index[{current_range}]", "r") as file:
+                    try:
+                        data = json.load(file)
+                    except json.JSONDecodeError:
+                        data = {}
+            else:
+                data = {}
+
+            data.update(range_posting)
+
             with open(f"index_ranges/index[{current_range}]", "w") as file:
-                json.dump(range_posting, file)
+                json.dump(data, file)
+            print("dumped")
 
             range_posting.clear()
             current_range = new_range
@@ -105,7 +135,7 @@ def main():
     global NUM_DOCS
 
     counter = 0
-    partial_index = defaultdict(dict)
+    partial_index = defaultdict(list)
 
     for json_file in dev_path.rglob("*.json"):
         print(f"CURRENT -> {json_file}")
@@ -122,7 +152,7 @@ def main():
             word_frequencies = computeWordFrequencies(tokens)
 
             for word, freq in word_frequencies.items():
-                partial_index[word][NUM_DOCS] = [freq, calculate_tf(freq, docID_map[NUM_DOCS])]
+                partial_index[word].append((NUM_DOCS, freq))
 
             if counter % SAVE_INTERVAL == 0:
                 save_index_to_file(partial_index)
@@ -139,6 +169,7 @@ def main():
     final_index = merge_indices()
     generate_report(final_index)
     split_index()
+    return output_file
 
 
 def generate_report(final_index):
@@ -160,4 +191,4 @@ def generate_report(final_index):
 
 
 if __name__ == '__main__':
-    main()
+    split_index()

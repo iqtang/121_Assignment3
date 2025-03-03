@@ -1,15 +1,7 @@
-Search Report
-===========================
 
-Query: 'cristina lopes'
-No results found.
-
-Query: 'machine learning'
-No results found.
-
-Query: 'ACM'
-No results found.
-
-Query: 'master of software engineering'
-No results found.
-
+    Inverted Index Report
+    ----------------------
+    Number of documents indexed: 55393
+    Number of unique tokens: 1094910
+    Total size of the index on disk: 161803.41 KB
+    

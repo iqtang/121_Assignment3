@@ -4,6 +4,7 @@ import json
 from index_builder import get_range
 from nltk.stem import PorterStemmer
 from ranking import get_rankings
+from collections import Counter
 
 stop_words = [
     "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it", "no", "not",
@@ -44,26 +45,22 @@ class SearchEngine:
 
         categorized_terms = categorize_tokens(terms)
         index_data = {}
-        print(categorized_terms)
+        doc_counter = Counter()
+
         for term_range, term_list in categorized_terms.items():
             if term_list:
                 partial_index_path = f"index_ranges/index[{term_range}]"
                 if os.path.exists(partial_index_path):
                     with open(partial_index_path, "r") as f:
                         index_data.update(json.load(f))
-        #print(index_data)
         doc_sets = []
         for term in terms:
-            doc_set = set(index_data.get(term, {}).keys())
+            doc_set = index_data.get(term, {})
             if not doc_set:
                 return []
-            doc_sets.append(doc_set)
-        result_docs = set.intersection(
-            *doc_sets) if doc_sets else set()  # returns only the documents that have all the query terms
-        urls = [(result, docID_map[str(result)][0]) for result in result_docs]
-        return urls
-        #return get_rankings(terms, index_data, urls)
-
+            doc_counter.update(doc_set[0])
+        result_docs = sorted(doc_counter.items(), key=lambda x: x[1], reverse=True)
+        return [docID_map[str(result_doc[0])] for result_doc in result_docs]
 
 def run_queries(engine):
     queries = ["cristina lopes", "machine learning", "ACM", "master of software engineering"]
@@ -74,12 +71,26 @@ def run_queries(engine):
         if results:
             print(f"{len(results)} results:\n")
             for idx, (doc_id, url) in enumerate(results, start=1):
-                print(f"{idx}. DocID: {doc_id}, URL: {url}")
+                print(f"{idx}. URL: {doc_id}, docID: {url}")
+        else:
+            print("No results found.")
+
+def runner(engine):
+    while True:
+        inp = input("\nSearch query: ")
+        if inp.lower() == "exit":
+            break
+        print(f"\nQuery: '{inp.strip()}'")
+        results = engine.search(inp.strip())
+        if results:
+            print(f"{len(results)} results:\n")
+            for idx, (doc_id, url) in enumerate(results, start=1):
+                print(f"{idx}. URL: {doc_id}, DocID: {url}")
         else:
             print("No results found.")
 
 
-def write_report(engine, filename="report.txt"):
+def write_report(engine, filename="search_report.txt"):
     queries = ["cristina lopes", "machine learning", "ACM", "master of software engineering"]
     with open(filename, "w") as report_file:
         report_file.write("Search Report\n")
@@ -98,19 +109,8 @@ def write_report(engine, filename="report.txt"):
 
 
 if __name__ == "__main__":
-    inverted_index = {
-        "cristina": {1: (3, 0.0035), 2: (1, 0.0023)},
-        "lopes": {1: (2, 0.0023)},
-        "machine": {2: (2, 0.0046), 3: (1, 0.0016)},
-        "learning": {2: (1, 0.0023), 3: (2, 0.0032)},
-        "acm": {1: (1, 0.0012), 3: (1, 0.0016)},
-        "master": {4: (2, 0.0026)},
-        "of": {4: (2, 0.0026)},
-        "software": {4: (3, 0.0040)},
-        "engineering": {4: (1, 0.0013)}
-    }
-
-    engine = SearchEngine(inverted_index)
-
-    run_queries(engine)
-    write_report(engine)
+    pass
+    # engine = SearchEngine("/index_data/index.txt")
+    # runner(engine)
+    # # run_queries(engine)
+    # write_report(engine)

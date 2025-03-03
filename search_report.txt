@@ -1,0 +1,30 @@
+Search Report
+===========================
+
+Query: 'machine learning'
+
+1. URL: https://www.ics.uci.edu/~aburtsev/238P/2018fall/hw/xv6-setup.html, DocID: 2567
+2. URL: https://transformativeplay.ics.uci.edu/tpl-meeting-scheduler/, DocID: 67
+3. URL: https://www.ics.uci.edu/~eppstein/pubs/c-gd.html, DocID: 4641
+4. URL: https://transformativeplay.ics.uci.edu/aaron-trammell/, DocID: 166
+
+
+Query: 'master of software engineering'
+
+1. URL: https://www.ics.uci.edu/~aburtsev/238P/2018fall/hw/xv6-setup.html, DocID: 2567
+2. URL: https://transformativeplay.ics.uci.edu/aaron-trammell/, DocID: 166
+3. URL: https://transformativeplay.ics.uci.edu/events/board-games-reclaimed/, DocID: 611
+4. URL: https://www.ics.uci.edu/~xpage/publications.html, DocID: 564
+5. URL: https://transformativeplay.ics.uci.edu/classes/, DocID: 180
+
+
+Query: 'ACM'
+
+1. URL: https://www.ics.uci.edu/~eppstein/pubs/c-gd.html, DocID: 4641
+2. URL: https://transformativeplay.ics.uci.edu/juliet-norton/, DocID: 72
+
+Query: 'Iftekhar Ahmed'
+
+1. URL: https://www.ics.uci.edu/~iftekha/publication/does-the-choice-of-mutation-tool-matter/, DocID: 300
+2. URL: https://transformativeplay.ics.uci.edu/classes/ics-163-mobile-ubiquitous-games/, DocID: 2841
+
