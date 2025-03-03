@@ -1,13 +1,13 @@
 import pathlib
 import json
 import heapq
-import ijson
+import json
 import os
 from collections import defaultdict
 from tokenizer import *
 from ranking import calculate_tf
 
-dev_path = pathlib.Path("DEV")
+dev_path = pathlib.Path("/users/delaneyharwell/DEV")
 partial_path = pathlib.Path("partial_indices")
 output_file = "index.json"
 
@@ -29,7 +29,7 @@ def add_to_map(data):
 
 def save_index_to_file(partial_index):
     global PARTIAL_INDEX_COUNTER
-
+    os.makedirs(partial_path, exist_ok=True)
     partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
     PARTIAL_INDEX_COUNTER += 1
     sorted_index = {key: {val: partial_index[val] for val in sorted(partial_index[key])} for key in sorted(partial_index)}
@@ -73,6 +73,7 @@ def split_index():
 
 
     current_range = "0-4"
+    os.makedirs("index_ranges", exist_ok=True)
     for word, posting in index.items():
         first_char = word[0].lower()
 
@@ -130,7 +131,7 @@ def main():
 
     if partial_index:
         save_index_to_file(partial_index)
-
+    os.makedirs("docID_data", exist_ok=True)
     if docID_map:
         with open("docID_data/docIDmap.json", "w") as f:
             json.dump(docID_map, f)

@@ -1,0 +1,17 @@
+Search Report
+===========================
+
+Query: 'cristina lopes'
+1. DocID: 1, URL: https://transformativeplay.ics.uci.edu/classes/
+
+Query: 'machine learning'
+1. DocID: 2, URL: https://transformativeplay.ics.uci.edu/juliet-norton/
+2. DocID: 3, URL: https://transformativeplay.ics.uci.edu/classes/ics-163-mobile-ubiquitous-games/
+
+Query: 'ACM'
+1. DocID: 1, URL: https://transformativeplay.ics.uci.edu/classes/
+2. DocID: 3, URL: https://transformativeplay.ics.uci.edu/classes/ics-163-mobile-ubiquitous-games/
+
+Query: 'master of software engineering'
+1. DocID: 4, URL: https://transformativeplay.ics.uci.edu/events/board-games-reclaimed/
+
