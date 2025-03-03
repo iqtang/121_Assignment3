@@ -38,18 +38,20 @@ class SearchEngine:
         query = query.lower()
         query = re.sub(r'[^a-zA-Z0-9]', " ", query)
         terms = re.findall(r'\b[a-zA-Z0-9_]+\b', query)
-        terms = [word for word in terms if word not in stop_words]
+        terms = [stemmer.stem(word) for word in terms if word not in stop_words]
         if not terms:
             return []
 
         categorized_terms = categorize_tokens(terms)
-        index_data = inverted_index
+        index_data = {}
+        print(categorized_terms)
         for term_range, term_list in categorized_terms.items():
             if term_list:
                 partial_index_path = f"index_ranges/index[{term_range}]"
                 if os.path.exists(partial_index_path):
                     with open(partial_index_path, "r") as f:
                         index_data.update(json.load(f))
+        #print(index_data)
         doc_sets = []
         for term in terms:
             doc_set = set(index_data.get(term, {}).keys())
