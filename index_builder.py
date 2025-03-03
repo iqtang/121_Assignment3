@@ -7,14 +7,14 @@ from collections import defaultdict
 from tokenizer import *
 from ranking import calculate_tf
 
-dev_path = pathlib.Path("developer")
+dev_path = pathlib.Path("DEV")
 partial_path = pathlib.Path("partial_indices")
 output_file = "index.json"
 
 unique_words = set()
 docID_map = dict()
 NUM_DOCS = 0
-SAVE_INTERVAL = 2000
+SAVE_INTERVAL = 10
 
 PARTIAL_INDEX_COUNTER = 1
 
@@ -32,10 +32,11 @@ def save_index_to_file(partial_index):
 
     partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
     PARTIAL_INDEX_COUNTER += 1
+    sorted_index = {key: {val: partial_index[val] for val in sorted(partial_index[key])} for key in sorted(partial_index)}
     try:
-
         with open(partial_index_path, 'w') as file:
-            json.dump(partial_index, file)
+            json.dump(sorted_index, file)
+
 
     except FileNotFoundError:
         print("Index file not found")
@@ -58,20 +59,6 @@ def merge_indices():
     print("Index merged and saved successfully.")
 
     return final_index
-
-    '''
-    merged_index = defaultdict(list)
-    heap = []
-    read_buffers = []
-
-    for json_file in partial_path.rglob("*.json"):
-        file = open(json_file, "r")
-        read_buffers.append(ijson.parse(file))
-
-        for prefix, event, value in read_buffers[0]:
-            if event == "map_key":
-                print(value)
-    '''
 
 
 def split_index():
@@ -117,9 +104,10 @@ def main():
     global NUM_DOCS
 
     counter = 0
-    partial_index = defaultdict(list)
+    partial_index = defaultdict(dict)
 
     for json_file in dev_path.rglob("*.json"):
+        print(f"CURRENT -> {json_file}")
         counter += 1
         with open(json_file, 'r') as file:
             NUM_DOCS += 1
@@ -133,11 +121,12 @@ def main():
             word_frequencies = computeWordFrequencies(tokens)
 
             for word, freq in word_frequencies.items():
-                partial_index[word][NUM_DOCS] = (freq, calculate_tf(freq, docID_map[NUM_DOCS]))
+                partial_index[word][NUM_DOCS] = [freq, calculate_tf(freq, docID_map[NUM_DOCS])]
 
             if counter % SAVE_INTERVAL == 0:
                 save_index_to_file(partial_index)
                 partial_index.clear()
+            print(f"DONE with: {json_file}")
 
     if partial_index:
         save_index_to_file(partial_index)
