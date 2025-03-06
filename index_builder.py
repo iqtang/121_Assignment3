@@ -91,23 +91,8 @@ def split_index():
                 with open(f"index_ranges/index[{current_range}]", "r") as f:
                     existing_index = json.load(f)
             except (FileNotFoundError, json.JSONDecodeError):
-                existing_index = {}
+                existing_index.update(range_posting)
 
-            for term, doc_data in range_posting.items():
-                if term not in existing_index:
-                    # If the term is not in the existing index, add it
-                    existing_index[term] = doc_data
-                else:
-                    # Merge docIDs for the term
-                    for doc_id, values in doc_data.items():
-                        if doc_id in existing_index[term]:
-                            existing_index[term][doc_id][0] += values[0]
-                            existing_index[term][doc_id][1] = max(existing_index[term][doc_id][1],
-                                                                  values[1])  # Keep max tf
-                        else:
-                            existing_index[term][doc_id] = values
-
-            print(f"NEW INDEX -->>>>>\n\n{range_posting}")
             with open(f"index_ranges/index[{current_range}]", "w") as file:
                 json.dump(existing_index, file)
 
