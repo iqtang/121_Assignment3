@@ -1,0 +1,15 @@
+Search Report
+===========================
+
+Query: 'cristina lopes'
+No results found.
+
+Query: 'machine learning'
+No results found.
+
+Query: 'ACM'
+No results found.
+
+Query: 'master of software engineering'
+No results found.
+
