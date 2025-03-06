@@ -105,7 +105,6 @@ def split_index():
                             existing_index[term][doc_id][1] = max(existing_index[term][doc_id][1],
                                                                   values[1])  # Keep max tf
                         else:
-                            # Add new entry
                             existing_index[term][doc_id] = values
 
             print(f"NEW INDEX -->>>>>\n\n{range_posting}")
