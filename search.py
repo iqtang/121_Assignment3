@@ -5,6 +5,7 @@ from index_builder import get_range
 from nltk.stem import PorterStemmer
 from ranking import get_rankings
 
+
 def categorize_tokens(terms):
     categories = {'0-4': [], '5-9': [], 'a-m': [], 'n-z': []}
 
@@ -13,7 +14,6 @@ def categorize_tokens(terms):
         categories[token_range].append(term)
 
     return categories
-
 
 
 class SearchEngine:
@@ -36,64 +36,14 @@ class SearchEngine:
             return []
 
         categorized_terms = categorize_tokens(terms)
-        index_data = inverted_index
-        '''
+
+        index_data = {}
         for term_range, term_list in categorized_terms.items():
             if term_list:
                 partial_index_path = f"index_ranges/index[{term_range}]"
                 if os.path.exists(partial_index_path):
                     with open(partial_index_path, "r") as f:
                         index_data.update(json.load(f))
-        '''
-        doc_sets = []
-        for term in terms:
-            doc_set = set(index_data.get(term, {}).keys())
-            if not doc_set:
-                return []
-            doc_sets.append(doc_set)
-        result_docs = set.intersection(*doc_sets) if doc_sets else set() #returns only the documents that have all the query terms
-        urls =  [(result, docID_map[str(result)][0]) for result in result_docs]
-        return get_rankings(terms, index_data, urls)
-
-import os
-import re
-import json
-from index_builder import get_range
-from nltk.stem import PorterStemmer
-from ranking import get_rankings
-
-
-def categorize_tokens(terms):
-    categories = {'0-4': [], '5-9': [], 'a-m': [], 'n-z': []}
-
-    for term in terms:
-        token_range = get_range(term[0])
-        categories[token_range].append(term)
-
-    return categories
-
-
-class SearchEngine:
-    def __init__(self, inverted_index):
-        self.inverted_index = inverted_index
-
-    def search(self, query):
-        try:
-            with open('docID_data/docIDmap.json', "r") as f:
-                docID_map = json.load(f)
-        except FileNotFoundError:
-            return []
-
-        stemmer = PorterStemmer()
-        query = query.lower()
-        query = re.sub(r'[^a-zA-Z0-9]', " ", query)
-        terms = re.findall(r'\b[a-zA-Z0-9_]+\b', query)
-        terms = [stemmer.stem(word) for word in terms]
-        if not terms:
-            return []
-
-        categorized_terms = categorize_tokens(terms)
-        index_data = self.inverted_index
 
         doc_sets = []
         for term in terms:
@@ -101,7 +51,8 @@ class SearchEngine:
             if not doc_set:
                 return []
             doc_sets.append(doc_set)
-        result_docs = set.intersection(*doc_sets) if doc_sets else set()
+        result_docs = set.intersection(
+            *doc_sets) if doc_sets else set()  # returns only the documents that have all the query terms
         urls = [(result, docID_map[str(result)][0]) for result in result_docs]
         return get_rankings(terms, index_data, urls)
 
@@ -115,7 +66,7 @@ def run_queries(engine):
         if results:
             print(f"{len(results)} results:")
             for idx, (doc_id, url, score) in enumerate(results, start=1):
-                print(f"{idx}. DocID: {doc_id}, URL: {url}, Score: {score}")
+                print(f"{idx}. DocID: {doc_id}, URL: {url[1]}, Score: {score}")
         else:
             print("No results found.")
 
@@ -137,21 +88,21 @@ def write_report(engine, filename="report.txt"):
             report_file.write("\n")
     print(f"\nReport written to '{filename}'.")
 
+def runner(search_engine):
+    while True:
+        inp = input("\nSearch query: ")
+        if inp.lower() == "exit":
+            break
+        print(f"\nQuery: '{inp.strip()}'")
+        results = search_engine.search(inp.strip())
+        if results:
+            print(f"{len(results)} results:\n")
+            for idx, url in enumerate(results, start=1):
+                print(f"{idx}. URL: {url[1]}")
+        else:
+            print("No results found.")
+
 
 if __name__ == "__main__":
-    inverted_index = {
-        "cristina": {1: (3, 0.0035), 2: (1, 0.0023)},
-        "lopes": {1: (2, 0.0023)},
-        "machine": {2: (2, 0.0046), 3: (1, 0.0016)},
-        "learning": {2: (1, 0.0023), 3: (2, 0.0032)},
-        "acm": {1: (1, 0.0012), 3: (1, 0.0016)},
-        "master": {4: (2, 0.0026)},
-        "of": {4: (2, 0.0026)},
-        "software": {4: (3, 0.0040)},
-        "engineering": {4: (1, 0.0013)}
-    }
-
-    engine = SearchEngine(inverted_index)
-
-    run_queries(engine)
-    write_report(engine)
+    se = SearchEngine("Inverted Index")
+    runner(se)

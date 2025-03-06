@@ -5,7 +5,7 @@ import ijson
 import os
 from collections import defaultdict
 from tokenizer import *
-from ranking import calculate_tf
+from ranking import calculate_tf, set_tf_idfs
 
 dev_path = pathlib.Path("DEV")
 partial_path = pathlib.Path("partial_indices")
@@ -14,7 +14,7 @@ output_file = "index.json"
 unique_words = set()
 docID_map = dict()
 NUM_DOCS = 0
-SAVE_INTERVAL = 10
+SAVE_INTERVAL = 2000
 
 PARTIAL_INDEX_COUNTER = 1
 
@@ -29,10 +29,17 @@ def add_to_map(data):
 
 def save_index_to_file(partial_index):
     global PARTIAL_INDEX_COUNTER
+    os.makedirs(partial_path, exist_ok = True)
 
     partial_index_path =  f"partial_indices/partial_index_{PARTIAL_INDEX_COUNTER}.json"
     PARTIAL_INDEX_COUNTER += 1
-    sorted_index = {key: {val: partial_index[val] for val in sorted(partial_index[key])} for key in sorted(partial_index)}
+    sorted_index = {
+        key: {doc_id: value for doc_id, value in sorted(nested_dict.items())}
+        for key, nested_dict in sorted(partial_index.items())
+    }
+
+    print(sorted_index)
+
     try:
         with open(partial_index_path, 'w') as file:
             json.dump(sorted_index, file)
@@ -44,13 +51,13 @@ def save_index_to_file(partial_index):
 
 
 def merge_indices():
-    final_index = defaultdict(list)
+    final_index = defaultdict(dict)
 
     for json_file in partial_path.rglob("*.json"):
         with open(json_file, "r") as file:
             partial_index = json.load(file)
             for word, postings in partial_index.items():
-                final_index[word].extend(postings)
+                final_index[word].update(postings)
 
     # Save final index
     with open(output_file, "w") as file:
@@ -62,28 +69,53 @@ def merge_indices():
 
 
 def split_index():
-    ranges = {"0-4", "5-9", "a-m", "n-z"}
+    os.makedirs("index_ranges", exist_ok = True)
     range_posting = defaultdict(None)
 
-
-
-    index = defaultdict(list)
+    print("LOADING JSON...")
     with open("index.json", "r") as file:
         index = json.load(file)
 
+    print("JSON LOADED!\n")
+
 
     current_range = "0-4"
+    print(f"CURRENT RANGE ->>> {current_range}")
     for word, posting in index.items():
         first_char = word[0].lower()
 
         new_range = get_range(first_char)
 
         if new_range != current_range:
+            try:
+                with open(f"index_ranges/index[{current_range}]", "r") as f:
+                    existing_index = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                existing_index = {}
+
+            for term, doc_data in range_posting.items():
+                if term not in existing_index:
+                    # If the term is not in the existing index, add it
+                    existing_index[term] = doc_data
+                else:
+                    # Merge docIDs for the term
+                    for doc_id, values in doc_data.items():
+                        if doc_id in existing_index[term]:
+                            existing_index[term][doc_id][0] += values[0]
+                            existing_index[term][doc_id][1] = max(existing_index[term][doc_id][1],
+                                                                  values[1])  # Keep max tf
+                        else:
+                            # Add new entry
+                            existing_index[term][doc_id] = values
+
+            print(f"NEW INDEX -->>>>>\n\n{range_posting}")
             with open(f"index_ranges/index[{current_range}]", "w") as file:
-                json.dump(range_posting, file)
+                json.dump(existing_index, file)
 
             range_posting.clear()
+            existing_index.clear()
             current_range = new_range
+            print(f"\n\nRANGE NOW ---> {current_range}\n")
 
         range_posting[word] = posting
 
@@ -132,11 +164,13 @@ def main():
         save_index_to_file(partial_index)
 
     if docID_map:
+        os.makedirs("docID_data", exist_ok = True)
         with open("docID_data/docIDmap.json", "w") as f:
             json.dump(docID_map, f)
 
     final_index = merge_indices()
     generate_report(final_index)
+    set_tf_idfs(final_index)
     split_index()
 
 

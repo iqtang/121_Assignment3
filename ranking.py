@@ -20,15 +20,24 @@ def calculate_tf(freq, mapVal):
 
     return freq / mapVal[1]
 
+def set_tf_idfs(index):
+    for term, posting in index.items():
+        idf = NUM_DOCS / len(index[term])
+        for doc, data in posting.items():
+            data[1] = math.log(data[1] / idf)
+
+        print(f"\nSET TF-IDFs FOR {term}\n")
+
 def calculate_tf_idf_list(terms, index_data, url = None):
     res = []
 
     for term in terms:
-        if url: tf = index_data[term][url[0]][1]
-        else: tf = terms.count(term) / len(terms)
-
-        idf = NUM_DOCS / len(index_data[term])
-        res.append(math.log(tf / idf))
+        if url:
+            res.append(index_data[term][url[0]][1])
+        else:
+            tf = terms.count(term) / len(terms)
+            idf = NUM_DOCS / len(index_data[term])
+            res.append(math.log(tf / idf))
 
     return res
 
@@ -43,9 +52,7 @@ def get_tf_idfs(terms, index_data, urls):
 
 def get_rankings(terms, index_data, urls):
     url_tfs = get_tf_idfs(terms, index_data, urls)
-    print(f"URL TF-IDFS -----> {url_tfs}")
     term_tfs = calculate_tf_idf_list(terms, index_data)
-    print(f"QUERY TF-IDFS -----> {term_tfs}")
 
     similarities = [cosine_sim(term_tfs, tf) for tf in url_tfs]
     indexes = np.argsort(similarities)
