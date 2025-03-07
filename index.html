@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Zots-R-Us</h1>
+<input type="text" id="searchBox" placeholder="Search here...">
+<button onclick="performSearch()">Search</button>
+<div id="results"></div>
+<script>
+    function performSearch() {
+        const query = document.getElementById("searchBox").value.toLowerCase();
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "";
+        fetch(`http://127.0.0.1:5003/search?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                resultsDiv.innerHTML = "<h2>Results:</h2>";
+                resultsDiv.innerText += "\n";
+                if (data.results.length > 0){
+                    for (let i = 0; i < data.results.length; i++){
+                        resultsDiv.innerHTML += `<a href="${data.results[i]}">${data.results[i]}</a><br>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML += "<h3>Error fetching results.</h3>";
+                }
+
+
+            }).catch(error => {
+                resultsDiv.innerHTML = "<h3>Error fetching results.</h3>";
+        });
+    }
+</script>
+
+</body>
+</html>
