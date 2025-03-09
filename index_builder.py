@@ -1,13 +1,11 @@
 import pathlib
 import json
-import heapq
-import ijson
 import os
 from collections import defaultdict
 from tokenizer import *
 from ranking import calculate_tf, set_tf_idfs
 
-dev_path = pathlib.Path("DEV")
+dev_path = pathlib.Path("developer/DEV")
 partial_path = pathlib.Path("partial_indices")
 output_file = "index.json"
 
@@ -91,7 +89,9 @@ def split_index():
                 with open(f"index_ranges/index[{current_range}]", "r") as f:
                     existing_index = json.load(f)
             except (FileNotFoundError, json.JSONDecodeError):
-                existing_index.update(range_posting)
+                existing_index = {}
+
+            existing_index.update(range_posting)
 
             with open(f"index_ranges/index[{current_range}]", "w") as file:
                 json.dump(existing_index, file)

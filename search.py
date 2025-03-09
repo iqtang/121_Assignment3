@@ -1,32 +1,29 @@
 import os
 import re
 import json
+import time
 from index_builder import get_range
 from nltk.stem import PorterStemmer
 from ranking import get_rankings
+from txt_retrieval import retrieve_data
 
 
-def categorize_tokens(terms):
+'''def categorize_tokens(terms):
     categories = {'0-4': [], '5-9': [], 'a-m': [], 'n-z': []}
 
     for term in terms:
         token_range = get_range(term[0])
         categories[token_range].append(term)
 
-    return categories
+    return categories'''
 
 
 class SearchEngine:
-    def __init__(self, inverted_index):
+    def __init__(self, inverted_index, offsets):
         self.inverted_index = inverted_index
+        self.offsets = offsets
 
-    def search(self, query):
-        try:
-            with open('docID_data/docIDmap.json', "r") as f:
-                docID_map = json.load(f)
-        except FileNotFoundError:
-            return []
-
+    def search(self, query, docID_map):
         stemmer = PorterStemmer()
         query = query.lower()
         query = re.sub(r'[^a-zA-Z0-9]', " ", query)
@@ -35,15 +32,18 @@ class SearchEngine:
         if not terms:
             return []
 
-        categorized_terms = categorize_tokens(terms)
+        #categorized_terms = categorize_tokens(terms)
 
         index_data = {}
-        for term_range, term_list in categorized_terms.items():
+        '''for term_range, term_list in categorized_terms.items():
             if term_list:
                 partial_index_path = f"index_ranges/index[{term_range}]"
                 if os.path.exists(partial_index_path):
                     with open(partial_index_path, "r") as f:
-                        index_data.update(json.load(f))
+                        index_data.update(json.load(f))'''
+        terms = sorted(terms)
+        index_data = retrieve_data(terms, self.inverted_index, self.offsets)
+
 
         doc_sets = []
         for term in terms:
@@ -55,6 +55,8 @@ class SearchEngine:
             *doc_sets) if doc_sets else set()  # returns only the documents that have all the query terms
         urls = [(result, docID_map[str(result)][0]) for result in result_docs]
         return get_rankings(terms, index_data, urls)
+
+
 
 
 def run_queries(engine):
@@ -89,12 +91,23 @@ def write_report(engine, filename="report.txt"):
     print(f"\nReport written to '{filename}'.")
 
 def runner(search_engine):
+    try:
+        with open('docID_data/docIDmap.json', "r") as f:
+            docID_map = json.load(f)
+    except FileNotFoundError:
+        print("Missing docIDmap")
+
     while True:
         inp = input("\nSearch query: ")
+        start = time.time()
+
         if inp.lower() == "exit":
             break
         print(f"\nQuery: '{inp.strip()}'")
-        results = search_engine.search(inp.strip())
+        results = search_engine.search(inp.strip(), docID_map)
+        end = time.time()
+        time_taken = (end - start) * 1000
+        print(f"Retrival time: {time_taken: .2f} ms")
         if results:
             print(f"{len(results)} results:\n")
             for idx, url in enumerate(results, start=1):
