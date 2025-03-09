@@ -1,7 +1,8 @@
+import hashlib
 import pathlib
 import json
 import os
-from collections import defaultdict
+from collections import defaultdict, deque
 from tokenizer import *
 from ranking import calculate_tf, set_tf_idfs
 
@@ -11,8 +12,15 @@ output_file = "index.json"
 
 unique_words = set()
 docID_map = dict()
+
+exact_hashes = set()
+recent_hashes = deque(maxlen=10)
+
+
 NUM_DOCS = 0
 SAVE_INTERVAL = 2000
+HASH_BITS = 64
+SIMILARITY_THRESHOLD = 0.8
 
 PARTIAL_INDEX_COUNTER = 1
 
@@ -115,6 +123,38 @@ def get_range(character):
     else:
         return None
 
+def compute_simhash(tokens):
+    vector = [0] * HASH_BITS
+    for token in tokens:
+        token_hash = int(hashlib.md5(token.encode()).hexdigest(), 16)
+        for i in range(HASH_BITS):
+            bitmask = 1 << i
+            if token_hash & bitmask:
+                vector[i] += 1
+            else:
+                vector[i] -= 1
+    simhash_val = 0
+    for i in range(HASH_BITS):
+        if vector[i] > 0:
+            simhash_val |= (1 << i)
+    return simhash_val
+
+def compute_distance(hash1, hash2):
+    x = hash1 ^ hash2
+    return bin(x).count('1')
+
+def duplicate_detection(content):
+    #detects both near and exact duplicate by tracking past hash / simhash to compare to
+    content_hash = compute_simhash(content)
+    if content_hash in exact_hashes:
+        return True
+    exact_hashes.add(content_hash)
+    for past_hash in recent_hashes:
+        if compute_distance(content_hash, past_hash) < SIMILARITY_THRESHOLD:
+            return True
+    recent_hashes.append(content_hash)
+    return False
+
 
 def main():
     global NUM_DOCS
@@ -131,9 +171,11 @@ def main():
             #docID_map[NUM_DOCS] = (data.get("url"))
             #creares a docID map with the values being a tuple containing a
             #url as well as the number of words in the page.
-
-            add_to_map(data)
             tokens = tokenize(data)
+            if duplicate_detection(tokens):
+                continue
+            add_to_map(data)
+
             word_frequencies = computeWordFrequencies(tokens)
 
             for word, freq in word_frequencies.items():
