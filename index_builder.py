@@ -6,7 +6,7 @@ from collections import defaultdict, deque
 from tokenizer import *
 from ranking import calculate_tf, set_tf_idfs
 
-dev_path = pathlib.Path("developer/DEV")
+dev_path = pathlib.Path("/users/delaneyharwell/DEV")
 partial_path = pathlib.Path("partial_indices")
 output_file = "index.json"
 
@@ -123,9 +123,10 @@ def get_range(character):
     else:
         return None
 
-def compute_simhash(tokens):
+def compute_simhash(data):
+    tokens = tokenize(data)
     vector = [0] * HASH_BITS
-    for token in tokens:
+    for token, weight in tokens:
         token_hash = int(hashlib.md5(token.encode()).hexdigest(), 16)
         for i in range(HASH_BITS):
             bitmask = 1 << i
@@ -171,10 +172,11 @@ def main():
             #docID_map[NUM_DOCS] = (data.get("url"))
             #creares a docID map with the values being a tuple containing a
             #url as well as the number of words in the page.
-            tokens = tokenize(data)
-            if duplicate_detection(tokens):
+
+            if duplicate_detection(data):
                 continue
             add_to_map(data)
+            tokens = tokenize(data)
 
             word_frequencies = computeWordFrequencies(tokens)
 
