@@ -1,0 +1,23 @@
+Software engineering
+Paul Dourish
+Neural Network
+If they have this I will be shocked
+Department of Computer Science
+Delaney Harwell
+Simhash of a document
+Download pycharm
+Merge repository on github
+What is the capitol of Texas
+Typical design values for SRT in waste water treatment design
+UC Irvine Graduation
+Inheritance or interface implementation
+Python artificial intelligence
+Unzip folder to local machine
+SSH into virtual machine
+AWS instance termination
+Kubernetes cluster
+Run multiple threads in parallel
+Where is the nearest McDonalds
+
+
+
