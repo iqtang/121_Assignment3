@@ -110,8 +110,12 @@ def runner(search_engine):
         print(f"Retrival time: {time_taken: .2f} ms")
         if results:
             print(f"{len(results)} results:\n")
+            count = 0
             for idx, url in enumerate(results, start=1):
+                if count >=20:
+                    break
                 print(f"{idx}. URL: {url[1]}")
+                count += 1
         else:
             print("No results found.")
 
