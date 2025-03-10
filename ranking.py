@@ -56,7 +56,8 @@ def get_rankings(terms, index_data, urls):
 
     similarities = [cosine_sim(term_tfs, tf) for tf in url_tfs]
     indexes = np.argsort(similarities)
-    return [urls[index] for index in indexes[::-1]]
+    result = [urls[index] for index in indexes[::-1]]
+    return result
 
 
 
