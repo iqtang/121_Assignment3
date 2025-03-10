@@ -8,8 +8,7 @@ Simhash of a document
 Download pycharm
 Merge repository on github
 What is the capitol of Texas
-Typical design values for SRT in waste water treatment design
-UC Irvine Graduation
+The Donald Bren School of Information and Computer Sciences thank you Irvine Company
 Inheritance or interface implementation
 Python artificial intelligence
 Unzip folder to local machine
