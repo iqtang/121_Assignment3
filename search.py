@@ -5,7 +5,7 @@ import time
 from index_builder import get_range
 from nltk.stem import PorterStemmer
 from ranking import get_rankings
-from txt_retrieval import retrieve_data
+from txt_retrieval import retrieve_data, get_offsets
 
 
 '''def categorize_tokens(terms):
@@ -117,5 +117,6 @@ def runner(search_engine):
 
 
 if __name__ == "__main__":
-    se = SearchEngine("Inverted Index")
+    offset = get_offsets("final_index.txt")
+    se = SearchEngine("final_index.txt", offset)
     runner(se)
