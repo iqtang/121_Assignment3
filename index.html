@@ -14,16 +14,18 @@
     function performSearch() {
         const query = document.getElementById("searchBox").value.toLowerCase();
         const resultsDiv = document.getElementById("results");
-        fetch(`http://127.0.0.1:5004/search?query=${encodeURIComponent(query)}`)
+        resultsDiv.innerHTML = '';
+        fetch(`http://127.0.0.1:5008/search?query=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
-                resultsDiv.innerHTML += "<h2>Results:</h2>";
+                resultsDiv.innerHTML += '<h3>Time taken: ${data.time_taken}</h3>';
+                resultsDiv.innerHTML += '<h2>Results:</h2>';
                 for (let i = 0; i < 20; i++) {
                     resultsDiv.innerHTML += `<a href="${data.results[i][1]}">${data.results[i][1]}</a><br>`;
                 }
 
             }).catch(error => {
-                resultsDiv.innerHTML = "<h3>Error fetching results.</h3>";
+                resultsDiv.innerHTML = '<h3>Error fetching results.</h3>';
             });
     }
 </script>
