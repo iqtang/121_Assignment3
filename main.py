@@ -4,7 +4,7 @@ from flask_cors import CORS
 from ranking import *
 import search
 from txt_retrieval import *
-app = Flask(__name__)
+'''app = Flask(__name__)
 CORS(app)
 
 
@@ -22,12 +22,12 @@ def search():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5004,debug=True)
+    app.run(host="0.0.0.0", port=5004,debug=True)'''
 # import search
 # from txt_retrieval import get_offsets
 #
 #
-'''if __name__ == '__main__':
+if __name__ == '__main__':
     offsets = get_offsets("final_index.txt")
     engine = search.SearchEngine("final_index.txt", offsets)
     print("Welcome to the search engine!\nEnter your search query or 'exit' to exit.")
