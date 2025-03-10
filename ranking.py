@@ -33,7 +33,10 @@ def calculate_tf_idf_list(terms, index_data, url = None):
 
     for term in terms:
         if url:
-            res.append(index_data[term][url[0]][1])
+            if url[0] in index_data[term].keys():
+                res.append(index_data[term][url[0]][1])
+            else:
+                res.append(0)
         else:
             tf = terms.count(term) / len(terms)
             idf = NUM_DOCS / len(index_data[term])
