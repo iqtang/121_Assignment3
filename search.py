@@ -51,8 +51,7 @@ class SearchEngine:
             if not doc_set:
                 return []
             doc_sets.append(doc_set)
-        result_docs = set.intersection(
-            *doc_sets) if doc_sets else set()
+        result_docs = [doc for doc_set in doc_sets for doc in doc_set]
         urls = [(result, docID_map[str(result)][0]) for result in result_docs]
         return get_rankings(terms, index_data, urls)[:20]
 
